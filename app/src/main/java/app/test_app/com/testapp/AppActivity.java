@@ -6,6 +6,8 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,13 +17,15 @@ import com.hannesdorfmann.mosby.mvp.MvpActivity;
 
 import java.util.List;
 
-import app.test_app.com.testapp.mvp.model.Entry;
-import app.test_app.com.testapp.mvp.presenter.CachePresenter;
-import app.test_app.com.testapp.mvp.view.CacheView;
+import app.test_app.com.testapp.adapter.AppsRecyclerAdapter;
+import app.test_app.com.testapp.mvp.model.App;
+import app.test_app.com.testapp.mvp.presenter.AppPresenter;
+import app.test_app.com.testapp.mvp.view.AppView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmResults;
 
-public class CacheActivity extends MvpActivity<CacheView, CachePresenter> implements CacheView {
+public class AppActivity extends MvpActivity<AppView, AppPresenter> implements AppView {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -31,6 +35,8 @@ public class CacheActivity extends MvpActivity<CacheView, CachePresenter> implem
     AppBarLayout appBar;
     @BindView(R.id.fab)
     FloatingActionButton fab;
+    @BindView(R.id.apps_recyclerview)
+    RecyclerView recyclerview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +54,17 @@ public class CacheActivity extends MvpActivity<CacheView, CachePresenter> implem
             }
         });
 
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(AppActivity.this);
+        recyclerview.setLayoutManager(layoutManager);
+        recyclerview.setHasFixedSize(true);
+
         presenter.executeUpdate();
     }
 
     @NonNull
     @Override
-    public CachePresenter createPresenter() {
-        return new CachePresenter(CacheActivity.this);
+    public AppPresenter createPresenter() {
+        return new AppPresenter(AppActivity.this);
     }
 
 
@@ -81,7 +91,8 @@ public class CacheActivity extends MvpActivity<CacheView, CachePresenter> implem
 
 
     @Override
-    public void showCache(List<Entry> entries) {
-        System.out.println(entries);
+    public void showData(RealmResults<App> apps) {
+        AppsRecyclerAdapter adapter = new AppsRecyclerAdapter(AppActivity.this, apps, true);
+        recyclerview.setAdapter(adapter);
     }
 }

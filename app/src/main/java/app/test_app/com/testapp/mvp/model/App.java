@@ -2,7 +2,7 @@ package app.test_app.com.testapp.mvp.model;
 
 import io.realm.RealmObject;
 
-public class Entry extends RealmObject {
+public class App extends RealmObject {
     public String category;
     public String summary;
     public String title;
