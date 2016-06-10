@@ -16,14 +16,10 @@ import app.test_app.com.testapp.mvp.model.App;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 
-/**
- * Created by eliosf27 on 11/2/15.
- */
-
 public class AppsRecyclerAdapter extends
         RealmRecyclerViewAdapter<App, AppsRecyclerAdapter.AppsViewHolder> {
 
-    public AppsRecyclerAdapter(Context context, OrderedRealmCollection data, boolean autoUpdate) {
+    public AppsRecyclerAdapter(Context context, OrderedRealmCollection<App> data, boolean autoUpdate) {
         super(context, data, autoUpdate);
     }
 
@@ -37,9 +33,12 @@ public class AppsRecyclerAdapter extends
     public void onBindViewHolder(AppsViewHolder holder, int position) {
         App obj = this.getData().get(position);
         holder.txtTitle.setText(obj.getTitle());
-        Glide.with(context).load(obj.getImage()).into(holder.imgView);
+        Glide.with(context)
+                .load(obj.getImage())
+                .override(100, 100)
+                .fitCenter()
+                .into(holder.imgView);
     }
-
 
     public class AppsViewHolder extends RecyclerView.ViewHolder {
         TextView txtTitle;

@@ -10,7 +10,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
-
 public class ApiClient {
     public static final String API_URL = "https://itunes.apple.com";
 
@@ -20,16 +19,13 @@ public class ApiClient {
                                     .addConverterFactory(GsonConverterFactory.create())
                                     .build();
 
-
         Itunes itunes = retrofit.create(Itunes.class);
         return itunes.apps(20);
     }
 
-
     public interface Itunes {
         @GET("/us/rss/topfreeapplications/limit={limit}/json")
         Call<Objs> apps(@Path("limit") int limit);
-
     }
 
     public static class Summary {
@@ -40,19 +36,19 @@ public class ApiClient {
         }
     }
 
-    public static class Attributes {
-        public final String label;
-
-        public Attributes(String label) {
-            this.label = label;
-        }
-    }
-
     public static class Category {
         public final Attributes attributes;
 
         public Category(Attributes attributes) {
             this.attributes = attributes;
+        }
+
+        public static class Attributes {
+            public final String label;
+
+            public Attributes(String label) {
+                this.label = label;
+            }
         }
     }
 
@@ -71,7 +67,6 @@ public class ApiClient {
             this.label = label;
         }
     }
-
 
     public static class Entry {
         public Title title;

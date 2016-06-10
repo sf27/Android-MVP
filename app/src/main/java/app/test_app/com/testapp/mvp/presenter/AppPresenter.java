@@ -1,7 +1,6 @@
 package app.test_app.com.testapp.mvp.presenter;
 
 import android.content.Context;
-import android.hardware.camera2.params.Face;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -35,7 +34,7 @@ public class AppPresenter extends MvpBasePresenter<AppView> {
     }
 
     public void executeUpdate() {
-        if (isConnectingToInternet()) {
+        if (isConnectedToInternet()) {
             Call<ApiClient.Objs> call = ApiClient.getObjects();
             call.enqueue(new Callback<ApiClient.Objs>() {
                 @Override
@@ -47,19 +46,16 @@ public class AppPresenter extends MvpBasePresenter<AppView> {
 
                     RealmQuery<App> query = realm.where(App.class);
                     result = query.findAll();
-                    if (isViewAttached()) {
-                        getView().showData(result);
-                    }
+                    if (isViewAttached()) getView().showData(result);
 
                 }
 
                 @Override
                 public void onFailure(Call<ApiClient.Objs> call, Throwable t) {
-                    if (isViewAttached()) {
-                        getView().showData(result);
-                    }
+                    if (isViewAttached()) getView().showData(result);
                 }
             });
+
         } else {
             // if the device doesn't have an internet connection, load the data from cache
             RealmQuery<App> query = realm.where(App.class);
@@ -74,30 +70,22 @@ public class AppPresenter extends MvpBasePresenter<AppView> {
     private void clearCache() {
         RealmQuery<App> query = realm.where(App.class);
         result = query.findAll();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                result.deleteAllFromRealm();
-            }
-        });
+        realm.executeTransaction(realm1 -> result.deleteAllFromRealm());
     }
 
     private void saveData(Response<ApiClient.Objs> response) {
         for (final ApiClient.Entry entry : response.body().feed.entry) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    App object = realm.createObject(App.class);
-                    object.setCategory(entry.category.attributes.label);
-                    object.setImage(entry.images.get(0).label);
-                    object.setSummary(entry.summary.label);
-                    object.setTitle(entry.title.label);
-                }
+            realm.executeTransaction(realm1 -> {
+                App object = realm1.createObject(App.class);
+                object.setCategory(entry.category.attributes.label);
+                object.setImage(entry.images.get(0).label);
+                object.setSummary(entry.summary.label);
+                object.setTitle(entry.title.label);
             });
         }
     }
 
-    public boolean isConnectingToInternet() {
+    public boolean isConnectedToInternet() {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
